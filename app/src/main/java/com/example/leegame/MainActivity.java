@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
         char[][] map = new char[X][Y];
         boolean contains_player = false;
         boolean contains_goal = false;
-        int iterations = 0;
+
         do {
             contains_goal = false;
             contains_player = false;
@@ -330,10 +330,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            if(iterations>=200){
-                create_map();
-            }
-            iterations++;
         } while (!check_correctness(map));
         Toast.makeText(MainActivity.this, "Map created: "+map_name, Toast.LENGTH_SHORT).show();
         writer(map, map_name,"maps");
