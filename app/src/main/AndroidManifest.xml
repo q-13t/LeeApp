@@ -12,7 +12,6 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/lee_icon"
         android:label="@string/app_name"
-
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.Light.NoActionBar"
         tools:targetApi="29">

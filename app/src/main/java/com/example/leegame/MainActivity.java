@@ -3,14 +3,13 @@ package com.example.leegame;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -22,18 +21,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final int STORAGE_PERMISSION_CODE = 1000;
     private static final int STORAGE_PERMISSION_CODE_2 = 1001;
     private Spinner spinner;
     private CheckBox checkBox;
-    private EditText textView;
+    private TextView textView;
     private  Button run_button;
     private  Button delete_button;
     private  Button user_map_button;
@@ -45,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private char[][] path;
     private boolean repeat = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -63,10 +62,12 @@ public class MainActivity extends AppCompatActivity {
         update_spinner();
         dir_creator();
 
+
+
         run_button.setOnClickListener(view -> {
             if(checkBox.isChecked()){
-                create_map();
                 checkBox.setChecked(false);
+                create_map();
             }else {
                 stringBuilder.delete(0, stringBuilder.length());
                 stringBuilder.append("Input:\n");
@@ -79,13 +80,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 textView.setText(stringBuilder);
+//                text = stringBuilder.toString();
                 stringBuilder.delete(0,stringBuilder.length());
             }
         });
 
         user_map_button.setOnClickListener(view -> {
             String input = textView.getText().toString();
-            System.out.println(input);
+//            System.out.println(input);
             boolean contains_player = true;
             boolean contains_goal = true;
             if(!input.contains("@") ){
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 contains_goal = false;
                 Toast.makeText(MainActivity.this,"Missing $!",Toast.LENGTH_SHORT).show();
             }
-            System.out.println(contains_goal && contains_player);
+//            System.out.println(contains_goal&& contains_player);
             if(contains_goal && contains_player){
             String[] lines = input.split( "\n" );
             map = new ArrayList<>();
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             map_selected = "u_map_"+last_map_numb;
 
             for(String line: lines){
-                System.out.println(line);
+//                System.out.println(line);
                 ArrayList<Character> characterList = (ArrayList<Character>) line.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
                 if(Y < characterList.size()){
                     Y= characterList.size();
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < map.size(); i++) {
                 for (int j = 0; j < map.get(i).size(); j++) {
-                    System.out.println(map.get(i).get(j));
+//                    System.out.println(map.get(i).get(j));
                     map_chars[i][j] = map.get(i).get(j);
                 }
             }
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 stringBuilder.append(e.getMessage());
             }
             textView.setText(stringBuilder);
+//                text = stringBuilder.toString();
             stringBuilder.delete(0,stringBuilder.length());
             }
         });
@@ -155,12 +158,13 @@ public class MainActivity extends AppCompatActivity {
             update_spinner();
         });
 
+
     }
 
     private void delete_selected_file(String map_to_delete) {
         try {
             Files.walk(getFilesDir().toPath()).forEach(x -> {
-                System.out.println(x.getFileName());
+//                System.out.println(x.getFileName());
                 if (x.getFileName().toString().contains(map_to_delete)) {
                     x.toFile().delete();
                     Toast.makeText(MainActivity.this,map_to_delete+" deleted!",Toast.LENGTH_SHORT).show();
@@ -172,7 +176,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void update_spinner() {
         String[] files = list_files();
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item,files);
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.item_dropdown_layout,files);
+        adapter.setDropDownViewResource(R.layout.item_selected_layout);
         spinner.setAdapter(adapter);
         if(selection_pos>=files.length){
             spinner.setSelection(0);
@@ -255,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         String[] maps = new String[list.size()];
         list.toArray(maps);
 
-        System.out.print("\n****************\n"+maps.length+"\n****************\n");
+//        System.out.print("\n****************\n"+maps.length+"\n****************\n");
         return maps;
     }
 
@@ -296,16 +301,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void create_map() {
         String map_name = "c_map_" +last_map_numb;
-        int X = (int) Math.round(Math.random() * 20);
-        int Y = (int) Math.round(Math.random() * 20);
+        int X = (int) Math.round((Math.random() * 20)+5);
+        int Y = (int) Math.round((Math.random() * 20)+5);
         System.out.println("Dimmensions: X " + X + " Y " + Y);
-        char[][] map = new char[X][Y];
+        char[][] map;
         boolean contains_player = false;
         boolean contains_goal = false;
 
         do {
+            System.out.println("HERE!");
             contains_goal = false;
             contains_player = false;
+            map = new char[X][Y];
             for (int x = 0; x < X; x++) {
                 for (int y = 0; y < Y; y++) {
                     int random = (int) Math.round(Math.random() * 100);
@@ -365,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
         }
         File dir = new File(getFilesDir()+"/"+destination);
         StringBuilder sBuilder = new StringBuilder();
-        System.out.println(dir+"/"+map_name.replaceAll(" ","_")+ending);
+//        System.out.println(dir+"/"+map_name.replaceAll(" ","_")+ending);
         try (FileWriter fw = new FileWriter(new File(dir+"/", map_name.replaceAll(" ","_") + ending))) {
             for (int i = 0; i < path.length; i++) {
                 for (int j = 0; j < path[i].length; j++) {
@@ -483,12 +490,12 @@ public class MainActivity extends AppCompatActivity {
 
         build_path(map_o_ints);
 
-        for (char[] chars_1 : path) {
-            for (char chars_2 : chars_1) {
-                System.out.print(chars_2);
-            }
-            System.out.println();
-        }
+//        for (char[] chars_1 : path) {
+//            for (char chars_2 : chars_1) {
+//                System.out.print(chars_2);
+//            }
+//            System.out.println();
+//        }
     }
 
     public boolean check(int[][] map_new, int[][] map_old) {

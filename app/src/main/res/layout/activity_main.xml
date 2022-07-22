@@ -4,102 +4,95 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/black">
 
-    <CheckBox
-        android:id="@+id/checkBox"
-        android:layout_width="175dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="48dp"
-        android:text="@string/Randomize"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner" />
-
-    <!--    <TextView-->
-<!--        android:id="@+id/textView"-->
-<!--        android:layout_width="369dp"-->
-<!--        android:layout_height="393dp"-->
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:layout_marginTop="156dp"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:text="@string/app_name"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/spinner"-->
-<!--        />-->
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="52dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="20dp"
-        android:text="@string/Run"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.794"
-        app:layout_constraintStart_toEndOf="@+id/checkBox"
-        app:layout_constraintTop_toBottomOf="@+id/spinner" />
-
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:dropDownWidth="300dp"
-        android:scrollbarAlwaysDrawHorizontalTrack="true"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarStyle="insideOverlay"
-        android:scrollbars="horizontal|vertical"
-        android:verticalScrollbarPosition="left"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="1dp"
-       />
-
-    <EditText
-        android:id="@+id/text_field"
-        android:layout_width="360dp"
-        android:layout_height="365dp"
-        android:autoSizeTextType="none"
-        android:background="@android:color/transparent"
-        android:inputType="text|textMultiLine"
-        android:scrollbarAlwaysDrawHorizontalTrack="true"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarStyle="insideInset"
-        android:scrollbars="horizontal|vertical"
-        android:scrollHorizontally="true"
-        android:textAlignment="viewStart"
-        android:textAllCaps="true"
-        android:textColorHint="#00FFFFFF"
-        android:typeface="monospace"
-        android:verticalScrollbarPosition="left"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_map_button"
-        android:cursorVisible="true"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
-    <Button
-        android:id="@+id/delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/Delete"
-        app:layout_constraintEnd_toStartOf="@+id/user_map_button"
-        app:layout_constraintHorizontal_bias="0.308"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+        <Spinner
+            android:id="@+id/spinner"
+            style="@style/mySpinnerItemStyle"
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:layout_marginTop="48dp"
+            android:background="@color/light_grey"
+            android:dropDownWidth="300dp"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarStyle="insideOverlay"
+            android:scrollbars="horizontal|vertical"
+            android:verticalScrollbarPosition="left"
+            tools:ignore="MissingConstraints,SpeakableTextPresentCheck"
 
-    <Button
-        android:id="@+id/user_map_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="44dp"
-        android:text="@string/User_Map"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+            />
 
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+
+                android:id="@+id/checkBox"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:background="@color/light_grey"
+                android:text="@string/Randomize"
+                android:textColor="@color/light_blue_ish" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/light_grey"
+                android:text="@string/Run"
+                android:textColor="@color/light_blue_ish" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="67dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/delete_button"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:background="@color/light_grey"
+                android:text="@string/Delete"
+                android:textColor="@color/light_blue_ish" />
+
+            <Button
+                android:id="@+id/user_map_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/light_grey"
+                android:text="@string/User_Map"
+                android:textColor="@color/light_blue_ish" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/text_field"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ems="10"
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:textColor="@color/light_blue_ish"
+            android:textSize="25dp"
+            android:typeface="monospace"
+            />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
