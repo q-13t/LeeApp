@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 if(!map_selected.contains("done")) {
                     try {
                         calculate_path();
-                    } catch (UnableToFindSolutionExeption e) {
+                    } catch (UnableToFindSolutionException e) {
                         stringBuilder.append(e.getMessage());
                     }
                 }
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
             String map_str = "";
             for (int i = 0; i <map.size(); i++) {
                 for (int j = 0; j < map.get(i).size(); j++) {
-                    if(map.get(i).get(j).equals(" ")){
+                    if(map.get(i).get(j).equals(' ')){
                         map_str+="  ";
                     }else{
                         map_str+=map.get(i).get(j);
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             writer(map_chars, map_selected,"maps");
             try {
                 calculate_path();
-            } catch (UnableToFindSolutionExeption e) {
+            } catch (UnableToFindSolutionException e) {
                 stringBuilder.append(e.getMessage());
             }
             textView.setText(stringBuilder);
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         String map_str = "";
         for (int i = 0; i <map.size(); i++) {
             for (int j = 0; j < map.get(i).size(); j++) {
-                if(map.get(i).get(j).equals(" ")){
+                if(map.get(i).get(j).equals(' ')){
                     map_str+="  ";
                 }else{
                     map_str+=map.get(i).get(j);
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
         String map_name = "c_map_" +last_map_numb;
         int X = (int) Math.round((Math.random() * 20)+5);
         int Y = (int) Math.round((Math.random() * 20)+5);
-        System.out.println("Dimmensions: X " + X + " Y " + Y);
+        System.out.println("Dimensions: X " + X + " Y " + Y);
         char[][] map;
         boolean contains_player = false;
         boolean contains_goal = false;
@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
         update_spinner();
     }
 
-    public void calculate_path() throws UnableToFindSolutionExeption {
+    public void calculate_path() throws UnableToFindSolutionException {
         repeat = false;
         path = new char[map.size()][map.get(0).size()];
         int[][] map_o_ints = new int[map.size()][map.get(0).size()];
@@ -471,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
 //             }
 //             System.out.println("*****************************************************");
             if (iterations >= 200) {
-                throw new UnableToFindSolutionExeption();
+                throw new UnableToFindSolutionException();
             }
             iterations++;
         } while (!check(map_o_ints, pre));
@@ -640,8 +640,8 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-class UnableToFindSolutionExeption extends Exception {
-    public UnableToFindSolutionExeption() {
+class UnableToFindSolutionException extends Exception {
+    public UnableToFindSolutionException() {
         super("Algorithm could not find solution for this map!");
     }
 
