@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i <map.size(); i++) {
                 for (int j = 0; j < map.get(i).size(); j++) {
                     if(map.get(i).get(j).equals(' ')){
-                        map_str+="  ";
+                        map_str+=" ";
                     }else{
                         map_str+=map.get(i).get(j);
                     }
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i <map.size(); i++) {
             for (int j = 0; j < map.get(i).size(); j++) {
                 if(map.get(i).get(j).equals(' ')){
-                    map_str+="  ";
+                    map_str+=" ";
                 }else{
                     map_str+=map.get(i).get(j);
                 }
@@ -598,7 +598,7 @@ public class MainActivity extends AppCompatActivity {
                     // System.out.print(map_o_ints[x][y] + "\t");
                     // }
 
-                    if (map.get(x).get(y).equals(' ')) {
+                    if (map.get(x).get(y).equals(" ")) {
                         continue;
                     } else {
                         if (numb == map_o_ints[x][y] + 1) {
