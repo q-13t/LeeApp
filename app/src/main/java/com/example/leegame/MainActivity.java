@@ -1,13 +1,16 @@
 package com.example.leegame;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,9 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spinner;
     private CheckBox checkBox;
     private TextView textView;
-    private  Button run_button;
-    private  Button delete_button;
-    private  Button user_map_button;
+    private Button run_button;
+    private Button delete_button;
+    private Button user_map_button;
+    private ImageButton connection_button;
     private final StringBuilder stringBuilder=new StringBuilder();
     private String map_selected = "";
     private int selection_pos = 0;
@@ -58,11 +62,18 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.text_field);
         user_map_button = findViewById(R.id.user_map_button);
         delete_button = findViewById(R.id.delete_button);
+        connection_button = findViewById(R.id.connection_button);
 
         update_spinner();
         dir_creator();
 
-
+        connection_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent connection_intent= new Intent(getApplicationContext(),server_connection.class);
+                startActivity(connection_intent);
+            }
+        });
 
         run_button.setOnClickListener(view -> {
             if(checkBox.isChecked()){
@@ -301,8 +312,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void create_map() {
         String map_name = "c_map_" +last_map_numb;
-        int X = (int) Math.round((Math.random() * 20)+5);
-        int Y = (int) Math.round((Math.random() * 20)+5);
+        int X = (int) Math.round((Math.random() * 21)+5);
+        int Y = (int) Math.round((Math.random() * 21)+5);
         System.out.println("Dimensions: X " + X + " Y " + Y);
         char[][] map;
         boolean contains_player = false;

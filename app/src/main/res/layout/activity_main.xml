@@ -8,6 +8,7 @@
     android:background="@color/black">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
@@ -92,7 +93,20 @@
             android:textColor="@color/light_blue_ish"
             android:textSize="25dp"
             android:typeface="monospace"
+
             />
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/connection_button"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
+        app:srcCompat="@drawable/server_ico" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

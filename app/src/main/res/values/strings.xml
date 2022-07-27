@@ -5,6 +5,10 @@
     <string name="Path_to_file">Path to file</string>
     <string name="Delete">Delete File</string>
     <string name="User_Map">Solve My Map!</string>
+    <string name="ip">IP</string>
+    <string name="port">PORT</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
 
 
 </resources>
