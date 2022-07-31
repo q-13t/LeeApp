@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -31,6 +32,9 @@ import java.util.stream.Collectors;
 public class MainActivity extends AppCompatActivity {
     private static final int STORAGE_PERMISSION_CODE = 1000;
     private static final int STORAGE_PERMISSION_CODE_2 = 1001;
+    private static final int WIFI_PERMISSION_CODE = 1002;
+    private static final int NETWORK_PERMISSION_CODE = 1003;
+    private static final int INTERNET_PERMISSION_CODE = 1004;
     private Spinner spinner;
     private CheckBox checkBox;
     private TextView textView;
@@ -38,13 +42,15 @@ public class MainActivity extends AppCompatActivity {
     private Button delete_button;
     private Button user_map_button;
     private ImageButton connection_button;
-    private final StringBuilder stringBuilder=new StringBuilder();
+    protected static final StringBuilder stringBuilder = new StringBuilder();
     private String map_selected = "";
     private int selection_pos = 0;
     protected static ArrayList<ArrayList<Character>> map = new ArrayList<>();
     private int last_map_numb=0;
     private char[][] path;
     private boolean repeat = false;
+    public static ArrayList<String> server_maps = new ArrayList<>();
+    public static String map_str = "";
 
 
     @Override
@@ -55,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
         checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
         checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE_2);
+        checkPermission(Manifest.permission.ACCESS_WIFI_STATE, WIFI_PERMISSION_CODE);
+        checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, NETWORK_PERMISSION_CODE);
+        checkPermission(Manifest.permission.INTERNET, INTERNET_PERMISSION_CODE);
 
         spinner = findViewById(R.id.spinner);
         run_button = findViewById(R.id.button);
@@ -76,12 +85,52 @@ public class MainActivity extends AppCompatActivity {
         });
 
         run_button.setOnClickListener(view -> {
+            map_str = "";
+
+            System.out.println(map_selected);
+
             if(checkBox.isChecked()){
                 checkBox.setChecked(false);
                 create_map();
             }else {
                 stringBuilder.delete(0, stringBuilder.length());
                 stringBuilder.append("Input:\n");
+                if(map_selected.matches("s map .")){
+
+                    ConnectionHandler.send(map_selected.replaceAll(" ","_")+".txt");
+                    stringBuilder.append(map_str);
+                    while (map.size()==0){
+                        try {
+                            Thread.sleep(50);
+                        }catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    for (ArrayList<Character> ch_1:map) {
+                        for (Character ch_2:ch_1) {
+                            stringBuilder.append(ch_2);
+//                            System.out.println(ch_2);
+                        }
+                        stringBuilder.append("\n");
+                        System.out.println();
+                    }
+
+                    if(!map_selected.contains("done")) {
+                        try {
+                            calculate_path();
+                        } catch (UnableToFindSolutionException e) {
+                            stringBuilder.append(e.getMessage());
+                        }
+                    }else{
+                        reader(map_selected);
+                    }
+
+                    textView.setText(stringBuilder);
+//                text = stringBuilder.toString();
+                    stringBuilder.delete(0,stringBuilder.length());
+
+                }else {
                 reader(map_selected);
                 if(!map_selected.contains("done")) {
                     try {
@@ -93,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(stringBuilder);
 //                text = stringBuilder.toString();
                 stringBuilder.delete(0,stringBuilder.length());
+            }
             }
         });
 
@@ -185,12 +235,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void update_spinner() {
-        String[] files = list_files();
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.item_dropdown_layout,files);
+
+    void update_spinner() {
+        String[]  files =  list_files();
+        int files_size = files.length;
+        int server_maps_size = server_maps.size();
+
+        String[] maps_combined = new String[files_size+server_maps_size];
+
+        int i =0;
+
+        if(server_maps_size!=0){
+            for (; i < server_maps_size; i++) {
+                maps_combined[i] = server_maps.get(i).replaceAll(".txt","").replaceAll("_"," ");
+            }
+        }
+
+        if(files_size!=0){
+            for (int j =0; j < files_size; i++,j++) {
+                maps_combined[i] = files[j];
+            }
+        }
+
+        Arrays.stream(maps_combined).sorted();
+
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.item_dropdown_layout,maps_combined);
         adapter.setDropDownViewResource(R.layout.item_selected_layout);
         spinner.setAdapter(adapter);
-        if(selection_pos>=files.length){
+        if(selection_pos>=maps_combined.length){
             spinner.setSelection(0);
         }else{
             spinner.setSelection(selection_pos);
@@ -212,8 +284,7 @@ public class MainActivity extends AppCompatActivity {
         // Checking if permission is not granted
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[] { permission }, requestCode);
-        }
-//        else {
+       }       // else {
 //            Toast.makeText(MainActivity.this, "Permission already granted", Toast.LENGTH_SHORT).show();
 //        }
     }
@@ -296,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String map_str = "";
+
         for (int i = 0; i <map.size(); i++) {
             for (int j = 0; j < map.get(i).size(); j++) {
                 if(map.get(i).get(j).equals(' ')){

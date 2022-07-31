@@ -5,8 +5,13 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name = "android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name = "android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name = "android.permission.INTERNET"/>
+
 
     <application
+
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,11 +23,14 @@
         tools:targetApi="29">
         <activity
             android:name=".server_connection"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="sensorPortrait"
+            />
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="sensorPortrait">
+            android:screenOrientation="sensorPortrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
