@@ -13,9 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -28,9 +30,7 @@ public class server_connection extends AppCompatActivity {
     public static TextView status_field;
     private static int PORT =4000;
     private static String IP = "192.168.1.157";
-
-
-
+    private ConnectionHandler connection;
 
 
     @Override
@@ -46,7 +46,7 @@ public class server_connection extends AppCompatActivity {
         status_field = findViewById(R.id.connection_status);
 
 
-        if(ConnectionHandler.socket != null){
+        if(connection != null){
             status_field.setTextColor(Color.GREEN);
             status_field.setText("Connected!");
         }else{
@@ -79,8 +79,11 @@ public class server_connection extends AppCompatActivity {
                     try {
                         PORT  = Integer.valueOf(port_field.getText().toString());
                         IP = ip_field.getText().toString();
-                        if(ConnectionHandler.socket==null){
-                             new Thread(new ConnectionHandler(IP,PORT)).start();
+                        if(connection==null){
+                            System.out.println("connecting");
+                            connection = new ConnectionHandler(IP,PORT);
+                            new Thread(connection).start();
+                            MainActivity.connection = connection;
                         }
                     }catch (Exception e){
                         e.printStackTrace();
@@ -92,12 +95,20 @@ public class server_connection extends AppCompatActivity {
         disconnect_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(ConnectionHandler.socket!=null){
-                 ConnectionHandler.send("DISCONNECT");
+                if(connection!=null){
+                    if(ConnectionHandler.socket.isConnected()) {
+                        connection.send("DISCONNECT");
+                    }else{
+                        status_field.setTextColor(Color.RED);
+                        status_field.setText("Not Connected!");
+                    }
+                    connection = null;
                 }
             }
         });
     }
+
+
 }
 
 
@@ -107,21 +118,29 @@ class ConnectionHandler implements Runnable {
     public static Socket socket;
     private static PrintWriter out;
     private static BufferedReader in;
-    private static String message;
+    private static volatile String message="";
+
 
     ConnectionHandler(String IP,int PORT){
         this.IP=IP;
         this.PORT=PORT;
     }
 
-    public static void send(String msg){
-//        System.out.println(msg);
-        message = msg;
+    public Socket getSocket() {
+        return socket;
     }
 
-    @Override
+    public synchronized void send(String msg){
+            synchronized (this){
+                message = msg;
+                this.notify();
+            }
+    }
+
+@Override
     public void run() {
         try {
+            synchronized (this){
             if(socket ==null){
                 socket = new Socket(IP,PORT);
                 out = new PrintWriter(socket.getOutputStream(), true);
@@ -129,61 +148,53 @@ class ConnectionHandler implements Runnable {
                 server_connection.status_field.setTextColor(Color.GREEN);
                 server_connection.status_field.setText("Connected!");
                 String[] read = in.readLine().split("\\|");
-//                for (String string : read) {
-//                    System.out.println(string);
-//                }
                 for (String map : read) {
                     MainActivity.server_maps.add(map);
                 }
                 while (socket.isConnected()){
+                    this.wait();
+                        if(message.equals("DISCONNECT")) {
+                            out.println(message);
+                            out.flush();
+                            try {
+                                server_connection.status_field.setTextColor(Color.RED);
+                                server_connection.status_field.setText("Not Connected!");
+                                break;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }else{
 
-//                   System.out.println("ALIVE!");
+                            out.println(message);
+                            out.flush();
+                            String line = in.readLine();
+                            MainActivity.map = new ArrayList<>();
 
-                   if(message!=null){
-                    if(message.equals("DISCONNECT")) {
-                        out.println(message);
-                        out.flush();
-                        try {
-                            message=null;
-                            server_connection.status_field.setTextColor(Color.RED);
-                            server_connection.status_field.setText("Not Connected!");
-                            break;
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            for (String str_1: line.split("\\|")) {
+                                ArrayList<Character> characterList = (ArrayList<Character>) str_1.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+                                MainActivity.map.add(characterList);
+                            }
+                            synchronized (MainActivity.class){
+                                System.out.println("Notified!");
+                                MainActivity.class.notify();
+                            }
+
+                            this.wait();
+
+                            out.println(message);
+                            out.flush();
+
                         }
-                    }else{
-//                        System.out.println(message);
-                        out.println(message);
-                        out.flush();
-
-                        message=null;
-
-                        String line = in.readLine();
-
-
-//                        String input_line = line.replaceAll("\\|","\n");
-
-//                        System.out.println(input_line);
-
-//                        MainActivity.map_str = input_line;
-
-//                        MainActivity.stringBuilder.append(input_line);
-
-                       MainActivity.map = new ArrayList<>();
-
-                        for (String str_1: line.split("\\|")) {
-//                           System.out.println(str_1);
-                            ArrayList<Character> characterList = (ArrayList<Character>) str_1.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
-                            MainActivity.map.add(characterList);
-                        }
-
                     }
                 }
-                }
             }
-        }catch (Exception e ){
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        }finally{
+        }  catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
             try{
                 MainActivity.server_maps.clear();
                 in.close();
@@ -197,5 +208,8 @@ class ConnectionHandler implements Runnable {
             }
         }
         System.out.println("END!");
+        synchronized (MainActivity.class){
+            MainActivity.class.notify();
+        }
     }
 }
