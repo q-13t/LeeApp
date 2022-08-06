@@ -104,7 +104,7 @@ This is the heart of Lee algorithm. This function will fill map_o_ints map with 
 
 Helper function for [calculate path](#calculate-path).
 
-It will iterate over provided map with integer to determine wether precious and current maps are not equal and if goal("$") has been reached. If so function will return false first time for [calculate path](#calculate-path) to iterate one more time and true second time to finish calculation.
+It will iterate over provided map with integer to determine wether previous and current maps are not equal and if goal("$") has been reached. If so function will return false first time for [calculate path](#calculate-path) to iterate one more time and true second time to finish calculation.
 
 ### build path
 
