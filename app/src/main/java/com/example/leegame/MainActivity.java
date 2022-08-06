@@ -29,7 +29,9 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 /**
- * @author
+ * Main class to handle {@code activity_main} layout
+ * 
+ * @author Volodymyr Davybida
  */
 public class MainActivity extends AppCompatActivity {
     private static final int STORAGE_PERMISSION_CODE = 1000;
@@ -56,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
     public static String map_str = "";
     private static Intent connection_intent;
 
+    /**
+     * Controls {@code activity_main}. Sets buttons and text.
+     * 
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
@@ -84,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     if (connection_intent == null) {
-                        connection_intent = new Intent(getApplicationContext(), server_connection.class);
+                        connection_intent = new Intent(getApplicationContext(), ServerConnection.class);
                     }
                     startActivity(connection_intent);
                 }
@@ -99,14 +106,14 @@ public class MainActivity extends AppCompatActivity {
                 if (checkBox.isChecked()) {
                     checkBox.setChecked(false);
                     create_map();
-                    spinner.setSelection(spinner.getCount()-1);
+                    spinner.setSelection(spinner.getCount() - 1);
                 } else {
                     stringBuilder.delete(0, stringBuilder.length());
                     stringBuilder.append("Input:\n");
-                   if(map_selected.equals("Clear Field")){
-                       stringBuilder.replace(0,stringBuilder.length(),"");
-                       textView.setText(stringBuilder);
-                   } else if (map_selected.matches("s map .")) {
+                    if (map_selected.equals("Clear Field")) {
+                        stringBuilder.replace(0, stringBuilder.length(), "");
+                        textView.setText(stringBuilder);
+                    } else if (map_selected.matches("s map .")) {
                         synchronized (MainActivity.class) {
                             if (!map_selected.contains("done")) {
                                 try {
@@ -253,10 +260,15 @@ public class MainActivity extends AppCompatActivity {
             });
 
         } catch (Exception e) {
-            Toast.makeText(MainActivity.this, "Something bad happened!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Something REALLY bad happened!", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Deletes file containing map that is provided.
+     * 
+     * @param map_to_delete
+     */
     private void delete_selected_file(String map_to_delete) {
         try {
             Files.walk(getFilesDir().toPath()).forEach(x -> {
@@ -270,19 +282,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Updates spinner for the layout. If it is available adds server maps to the
+     * pool.
+     */
     void update_spinner() {
         String[] files = list_files();
         int files_size = files.length;
         int server_maps_size = server_maps.size();
 
-        String[] maps_combined = new String[files_size + server_maps_size+1];
+        String[] maps_combined = new String[files_size + server_maps_size + 1];
 
         int i = 0;
         maps_combined[i] = "Clear Field";
         i++;
         if (server_maps_size != 0) {
-            for (; i < server_maps_size; i++) {
-                maps_combined[i] = server_maps.get(i).replaceAll(".txt", "").replaceAll("_", " ");
+            for (int j = 0; j < server_maps.size(); i++, j++) {
+                maps_combined[i] = server_maps.get(j).replaceAll(".txt", "").replaceAll("_", " ");
             }
         }
 
@@ -316,6 +332,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Checks permissions for the application
+     * 
+     * @param permission  name
+     * @param requestCode random integer to be related to the permission
+     */
     public void checkPermission(String permission, int requestCode) {
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
@@ -326,6 +348,12 @@ public class MainActivity extends AppCompatActivity {
           // }
     }
 
+    /**
+     * Creates directories {@code maps} and {@code maps_done} for the application to
+     * save the files with maps to.
+     * 
+     * 
+     */
     public void dir_creator() {
         try {
             File dir = new File(getFilesDir(), "maps");
@@ -341,6 +369,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Walks directory {@code files} searching for the files with maps.
+     * 
+     * @return String[] with available maps.
+     */
     private String[] list_files() {
         last_map_numb = 0;
         File dir = new File(getFilesDir() + "");
@@ -381,6 +414,12 @@ public class MainActivity extends AppCompatActivity {
         return maps;
     }
 
+    /**
+     * Reads requested file into {@link #map} variable and adds it to the
+     * {@code stringBuilder} to be displayed.
+     * 
+     * @param map_name
+     */
     public void reader(String map_name) {
         File dir;
         if (map_name.contains("done")) {
@@ -417,6 +456,14 @@ public class MainActivity extends AppCompatActivity {
         stringBuilder.append(map_str);
     }
 
+    /**
+     * Crates map that contains player (@) and goal ($). And calls {@link #writer}
+     * to write newly created map to {@code files/maps} directory.
+     * </p>
+     * Dimensions of the map are from 5x5 up to 26x26
+     * 
+     * @return name of the created map
+     */
     public String create_map() {
         String map_name = "c_map_" + last_map_numb;
         int X = (int) Math.round((Math.random() * 21) + 5);
@@ -461,6 +508,12 @@ public class MainActivity extends AppCompatActivity {
         return map_name;
     }
 
+    /**
+     * Helper function for {@link #create_map()} function to check wether generated
+     * map fulfills requirements (contains "@" and "$")
+     * 
+     * @param map to be checked
+     */
     private boolean check_correctness(char[][] map) {
         boolean contains_player = false;
         boolean contains_goal = false;
@@ -480,7 +533,17 @@ public class MainActivity extends AppCompatActivity {
         return contains_all;
     }
 
-    public void writer(char[][] path, String map_name, String destination) {
+    /**
+     * Writes {@linkplain #map} to the desired location.
+     * </p>
+     * If {@code destination} is "maps_done" {@code map_name} will be suited with
+     * "_done".
+     * 
+     * @param map
+     * @param map_name
+     * @param destination
+     */
+    public void writer(char[][] map, String map_name, String destination) {
         String ending = "";
         if (destination.equals("maps")) {
             ending = ".txt";
@@ -492,9 +555,9 @@ public class MainActivity extends AppCompatActivity {
         StringBuilder sBuilder = new StringBuilder();
 
         try (FileWriter fw = new FileWriter(new File(dir + "/", map_name.replaceAll(" ", "_") + ending))) {
-            for (int i = 0; i < path.length; i++) {
-                for (int j = 0; j < path[i].length; j++) {
-                    sBuilder.append(path[i][j]);
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < map[i].length; j++) {
+                    sBuilder.append(map[i][j]);
                 }
                 sBuilder.append("\n");
             }
@@ -506,6 +569,14 @@ public class MainActivity extends AppCompatActivity {
         update_spinner();
     }
 
+    /**
+     * Calculates {@link #map} using Lee algorithm. Firstly fills {@code map_o_ints}
+     * with integers then calls {@link #build_path(int[][])}.
+     * 
+     * @see {@link #check(int[][], int[][])}
+     * 
+     * @throws UnableToFindSolutionException
+     */
     public void calculate_path() throws UnableToFindSolutionException {
         repeat = false;
         path = new char[map.size()][map.get(0).size()];
@@ -577,6 +648,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Checker function for {@link #calculate_path()} function.
+     * 
+     * @param map_new
+     * @param map_old
+     * @return wether map has been solved
+     */
     public boolean check(int[][] map_new, int[][] map_old) {
 
         boolean get_to_target = false;
@@ -626,6 +704,13 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+    /**
+     * Fills {@link #path} with "*" representing shortest distance from "@" to "$"
+     * using {@code map_o_ints} provided by {@link #calculate_path()} function.
+     * After calling {@link #writer(char[][], String, String)} to write solved map.
+     * 
+     * @param map_o_ints
+     */
     private void build_path(int[][] map_o_ints) {
         path = new char[map_o_ints.length][map_o_ints[0].length];
 
@@ -699,6 +784,8 @@ public class MainActivity extends AppCompatActivity {
 }
 
 /**
+ * Is thrown when Lee algorithm can't solve map.
+ * 
  * @author Volodymyr Davybida
  */
 class UnableToFindSolutionException extends Exception {
