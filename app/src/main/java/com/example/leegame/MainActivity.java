@@ -29,7 +29,7 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 /**
- * @author Volodymyr Davybida
+ * @author
  */
 public class MainActivity extends AppCompatActivity {
     private static final int STORAGE_PERMISSION_CODE = 1000;
@@ -99,10 +99,14 @@ public class MainActivity extends AppCompatActivity {
                 if (checkBox.isChecked()) {
                     checkBox.setChecked(false);
                     create_map();
+                    spinner.setSelection(spinner.getCount()-1);
                 } else {
                     stringBuilder.delete(0, stringBuilder.length());
                     stringBuilder.append("Input:\n");
-                    if (map_selected.matches("s map .")) {
+                   if(map_selected.equals("Clear Field")){
+                       stringBuilder.replace(0,stringBuilder.length(),"");
+                       textView.setText(stringBuilder);
+                   } else if (map_selected.matches("s map .")) {
                         synchronized (MainActivity.class) {
                             if (!map_selected.contains("done")) {
                                 try {
@@ -157,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
                         textView.setText(stringBuilder);
                         stringBuilder.delete(0, stringBuilder.length());
                     }
-
                 }
             });
 
@@ -272,10 +275,11 @@ public class MainActivity extends AppCompatActivity {
         int files_size = files.length;
         int server_maps_size = server_maps.size();
 
-        String[] maps_combined = new String[files_size + server_maps_size];
+        String[] maps_combined = new String[files_size + server_maps_size+1];
 
         int i = 0;
-
+        maps_combined[i] = "Clear Field";
+        i++;
         if (server_maps_size != 0) {
             for (; i < server_maps_size; i++) {
                 maps_combined[i] = server_maps.get(i).replaceAll(".txt", "").replaceAll("_", " ");
@@ -413,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
         stringBuilder.append(map_str);
     }
 
-    public void create_map() {
+    public String create_map() {
         String map_name = "c_map_" + last_map_numb;
         int X = (int) Math.round((Math.random() * 21) + 5);
         int Y = (int) Math.round((Math.random() * 21) + 5);
@@ -454,6 +458,7 @@ public class MainActivity extends AppCompatActivity {
         } while (!check_correctness(map));
         Toast.makeText(MainActivity.this, "Map created: " + map_name, Toast.LENGTH_SHORT).show();
         writer(map, map_name, "maps");
+        return map_name;
     }
 
     private boolean check_correctness(char[][] map) {

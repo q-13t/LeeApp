@@ -29,7 +29,7 @@ public class server_connection extends AppCompatActivity {
     private EditText port_field;
     public static TextView status_field;
     private static int PORT =4000;
-    private static String IP = "192.168.1.157";
+    private static String IP = "";
     private ConnectionHandler connection;
 
 
