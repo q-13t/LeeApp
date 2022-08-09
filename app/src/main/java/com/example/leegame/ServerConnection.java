@@ -28,12 +28,18 @@ public class ServerConnection extends AppCompatActivity {
     private ImageButton back_button;
     private Button connect_button;
     private Button disconnect_button;
-    private EditText ip_field;
-    private EditText port_field;
+    protected EditText ip_field;
+    protected EditText port_field;
     public static TextView status_field;
-    private static int PORT = 4000;
-    private static String IP = "";
-    private ConnectionHandler connection;
+
+    private BackButtonListener back_button_listener = new BackButtonListener(this);
+    private ConnectButtonListener connect_button_listener = new ConnectButtonListener(this);
+    private DisconnectButtonListener disconnect_button_listener =  new DisconnectButtonListener(this);
+
+
+    protected static int PORT = 4000;
+    protected static String IP = "";
+    protected static ConnectionHandler connection;
 
     /**
      * Controls {@code server_connection_layout}. Sets buttons and text.
@@ -67,52 +73,12 @@ public class ServerConnection extends AppCompatActivity {
             ip_field.setText(IP);
         }
 
-        back_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent main_intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(main_intent);
-            }
-        });
+        back_button.setOnClickListener(back_button_listener);
 
-        connect_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (port_field.getText().toString().contains("[^\\d]")) {
-                    Toast.makeText(ServerConnection.this, "Incorrect port value!", Toast.LENGTH_SHORT).show();
-                } else {
-                    try {
-                        PORT = Integer.valueOf(port_field.getText().toString());
-                        IP = ip_field.getText().toString();
-                        if (connection == null) {
-                            System.out.println("connecting");
-                            connection = new ConnectionHandler(IP, PORT);
-                            new Thread(connection).start();
-                            MainActivity.connection = connection;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+        connect_button.setOnClickListener(connect_button_listener);
 
-        disconnect_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (connection != null) {
-                    if (ConnectionHandler.socket.isConnected()) {
-                        connection.send("DISCONNECT");
-                    } else {
-                        status_field.setTextColor(Color.RED);
-                        status_field.setText("Not Connected!");
-                    }
-                    connection = null;
-                }
-            }
-        });
+        disconnect_button.setOnClickListener(disconnect_button_listener);
     }
-
 }
 
 /**
@@ -235,6 +201,69 @@ class ConnectionHandler implements Runnable {
         System.out.println("END!");
         synchronized (MainActivity.class) {
             MainActivity.class.notify();
+        }
+    }
+}
+
+class BackButtonListener implements View.OnClickListener{
+    private static ServerConnection server_connection;
+
+    BackButtonListener(ServerConnection connection){
+        server_connection = connection;
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent main_intent = new Intent(server_connection.getApplicationContext(), MainActivity.class);
+        server_connection.startActivity(main_intent);
+    }
+}
+
+class ConnectButtonListener implements View.OnClickListener{
+    private static ServerConnection server_connection;
+
+    ConnectButtonListener(ServerConnection connection){
+        server_connection = connection;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (server_connection.port_field.getText().toString().contains("[^\\d]")) {
+            Toast.makeText(server_connection, "Incorrect port value!", Toast.LENGTH_SHORT).show();
+        } else {
+            try {
+               server_connection.PORT = Integer.valueOf(server_connection.port_field.getText().toString());
+                server_connection.IP = server_connection.ip_field.getText().toString();
+                if (server_connection.connection == null || !server_connection.connection.getSocket().isConnected()) {
+                    System.out.println("connecting");
+                    server_connection.connection = new ConnectionHandler(server_connection.IP, server_connection.PORT);
+                    new Thread(server_connection.connection).start();
+                    MainActivity.connection_handler = server_connection.connection;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+class DisconnectButtonListener implements View.OnClickListener{
+    private static ServerConnection server_connection;
+
+    DisconnectButtonListener(ServerConnection connection){
+        server_connection = connection;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (server_connection.connection != null) {
+            if (ConnectionHandler.socket.isConnected()) {
+                server_connection.connection.send("DISCONNECT");
+            } else {
+                server_connection.status_field.setTextColor(Color.RED);
+                server_connection.status_field.setText("Not Connected!");
+            }
+            server_connection.connection = null;
         }
     }
 }
